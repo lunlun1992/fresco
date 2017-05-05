@@ -16,20 +16,25 @@ public class ImageActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image);
-
-        ListView listView = (ListView) this.findViewById(R.id.list_main);
-        MyAdapter adapter = new MyAdapter();
-        listView.setAdapter(adapter);
-
-        ArrayList<String> datas = new ArrayList<String>();
-
-
+        ArrayList<String> datas = new ArrayList<>();
         for(int i = 1; i <= 50; i++)
         {
             File file = new File(Environment.getExternalStorageDirectory().getPath() + "/kpgtest/" + Integer.toString(i) + ".kpg");
             Uri uri = Uri.fromFile(file);
             datas.add(uri.toString());
         }
+
+
+        ListView listViewleft = (ListView) this.findViewById(R.id.list_left);
+        MyAdapter adapter = new MyAdapter();
+        listViewleft.setAdapter(adapter);
+        adapter.setDatas(datas);
+
+
+        ListView listViewright = (ListView) this.findViewById(R.id.list_right);
+        adapter = new MyAdapter();
+        listViewright.setAdapter(adapter);
+        adapter.setDatas(datas);
 //        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/test.kpg");
 //        Uri uri = Uri.fromFile(file);
 //        datas.add(uri.toString());
@@ -136,7 +141,7 @@ public class ImageActivity extends Activity {
 //        uri = Uri.fromFile(file);
 //        datas.add(uri.toString());
 
-        adapter.setDatas(datas);
+
     }
 
 

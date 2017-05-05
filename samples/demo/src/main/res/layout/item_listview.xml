@@ -10,8 +10,8 @@
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/draweeview"
-        android:layout_width="720px"
-        android:layout_height="960px"/>
+        android:layout_width="528px"
+        android:layout_height="704px"/>
 
 
 </LinearLayout>
