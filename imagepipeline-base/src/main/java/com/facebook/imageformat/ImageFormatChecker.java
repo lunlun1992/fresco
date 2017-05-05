@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
-
+//TODO: Set HEVC in IMAGE FORMAT CHECKER
 package com.facebook.imageformat;
 
 import javax.annotation.Nullable;

@@ -19,6 +19,7 @@ import android.os.Build;
 import com.facebook.common.internal.Preconditions;
 import com.facebook.common.memory.PooledByteBuffer;
 import com.facebook.common.references.CloseableReference;
+import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.memory.FlexByteArrayPool;
 import com.facebook.imageutils.JfifUtil;
 
@@ -63,6 +64,11 @@ public class KitKatPurgeableDecoder extends DalvikPurgeableDecoder {
     } finally {
       CloseableReference.closeSafely(encodedBytesArrayRef);
     }
+  }
+
+  @Override
+  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(EncodedImage encodedImage, Bitmap.Config bitmapConfig) {
+    return null;
   }
 
   /**

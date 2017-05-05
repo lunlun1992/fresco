@@ -23,6 +23,7 @@ import com.facebook.common.memory.PooledByteBuffer;
 import com.facebook.common.memory.PooledByteBufferInputStream;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.common.streams.LimitedInputStream;
+import com.facebook.imagepipeline.image.EncodedImage;
 
 import static com.facebook.common.webp.WebpSupportStatus.sWebpBitmapFactory;
 
@@ -140,5 +141,10 @@ public class GingerbreadPurgeableDecoder extends DalvikPurgeableDecoder {
         memoryFile.close();
       }
     }
+  }
+
+  @Override
+  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(EncodedImage encodedImage, Bitmap.Config bitmapConfig) {
+    return null;
   }
 }

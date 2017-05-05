@@ -28,6 +28,7 @@ public final class DefaultImageFormats {
   public static final ImageFormat WEBP_EXTENDED_WITH_ALPHA =
       new ImageFormat("WEBP_EXTENDED_WITH_ALPHA", "webp");
   public static final ImageFormat WEBP_ANIMATED = new ImageFormat("WEBP_ANIMATED", "webp");
+  public static final ImageFormat KPG = new ImageFormat("KPG", "kpg");
 
   private static ImmutableList<ImageFormat> sAllDefaultFormats;
 
@@ -40,6 +41,16 @@ public final class DefaultImageFormats {
   public static boolean isWebpFormat(ImageFormat imageFormat) {
     return isStaticWebpFormat(imageFormat) ||
         imageFormat == WEBP_ANIMATED;
+  }
+
+  /**
+   * Check if the given image format is a Kpg image format
+   *
+   * @param imageFormat the image format to check
+   * @return true if WebP format
+   */
+  public static boolean isKpgFormat(ImageFormat imageFormat) {
+    return imageFormat == KPG;
   }
 
   /**
@@ -73,6 +84,7 @@ public final class DefaultImageFormats {
       mDefaultFormats.add(WEBP_EXTENDED);
       mDefaultFormats.add(WEBP_EXTENDED_WITH_ALPHA);
       mDefaultFormats.add(WEBP_ANIMATED);
+      mDefaultFormats.add(KPG);
       sAllDefaultFormats = ImmutableList.copyOf(mDefaultFormats);
     }
     return sAllDefaultFormats;

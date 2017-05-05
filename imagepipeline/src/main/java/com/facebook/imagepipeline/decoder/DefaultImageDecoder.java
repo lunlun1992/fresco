@@ -65,7 +65,9 @@ public class DefaultImageDecoder implements ImageDecoder {
         return decodeGif(encodedImage, options);
       } else if (imageFormat == DefaultImageFormats.WEBP_ANIMATED) {
         return decodeAnimatedWebp(encodedImage, options);
-      } else if (imageFormat == ImageFormat.UNKNOWN) {
+      } else if (imageFormat == DefaultImageFormats.KPG){
+        return decodeKpgStaticImage(encodedImage, options);
+      }else if (imageFormat == ImageFormat.UNKNOWN) {
         throw new IllegalArgumentException("unknown image format");
       }
       return decodeStaticImage(encodedImage, options);
@@ -207,5 +209,24 @@ public class DefaultImageDecoder implements ImageDecoder {
       final EncodedImage encodedImage,
       final ImageDecodeOptions options) {
     return mAnimatedImageFactory.decodeWebP(encodedImage, options, mBitmapConfig);
+  }
+
+  /**
+   * @param encodedImage input image (encoded bytes plus meta data)
+   * @return a CloseableStaticBitmap
+   */
+  public CloseableStaticBitmap decodeKpgStaticImage(
+          final EncodedImage encodedImage,
+          ImageDecodeOptions options) {
+    CloseableReference<Bitmap> bitmapReference =
+            mPlatformDecoder.decodeKpgFromEncodedImage(encodedImage, options.bitmapConfig);
+    try {
+      return new CloseableStaticBitmap(
+              bitmapReference,
+              ImmutableQualityInfo.FULL_QUALITY,
+              encodedImage.getRotationAngle());
+    } finally {
+      bitmapReference.close();
+    }
   }
 }

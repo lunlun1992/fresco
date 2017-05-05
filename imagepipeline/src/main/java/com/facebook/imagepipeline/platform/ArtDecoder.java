@@ -29,6 +29,7 @@ import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.memory.BitmapPool;
 import com.facebook.imageutils.BitmapUtil;
 import com.facebook.imageutils.JfifUtil;
+import com.facebook.imageutils.KpgUtil;
 
 /**
  * Bitmap decoder for ART VM (Lollipop and up).
@@ -86,6 +87,7 @@ public class ArtDecoder implements PlatformDecoder {
       throw re;
     }
   }
+
 
   /**
    * Creates a bitmap from encoded JPEG bytes. Supports a partial JPEG image.
@@ -164,6 +166,9 @@ public class ArtDecoder implements PlatformDecoder {
     return CloseableReference.of(decodedBitmap, mBitmapPool);
   }
 
+
+
+
   /**
    * Options returned by this method are configured with mDecodeBuffer which is GuardedBy("this")
    */
@@ -186,5 +191,67 @@ public class ArtDecoder implements PlatformDecoder {
     options.inMutable = true;
 
     return options;
+  }
+
+
+
+  /**
+   ** KPG Decoding Utils
+   */
+  protected CloseableReference<Bitmap> decodeKpgFromStream(
+          InputStream inputStream,
+          BitmapFactory.Options options,
+          int filesize)
+  {
+    Preconditions.checkNotNull(inputStream);
+    int sizeInBytes = BitmapUtil.getSizeInByteForBitmap(
+            options.outWidth,
+            options.outHeight,
+            options.inPreferredConfig);
+    final Bitmap bitmapToReuse = mBitmapPool.get(sizeInBytes);
+    if (bitmapToReuse == null) {
+      throw new NullPointerException("BitmapPool.get returned null");
+    }
+    options.inBitmap = bitmapToReuse;
+
+    Bitmap decodedBitmap;
+    ByteBuffer byteBuffer = mDecodeBuffers.acquire();
+    if (byteBuffer == null) {
+      byteBuffer = ByteBuffer.allocate(DECODE_BUFFER_SIZE);
+    }
+    try {
+      options.inTempStorage = byteBuffer.array();
+      decodedBitmap = KpgUtil.decodeStream(inputStream, null, options, filesize);
+    } catch (RuntimeException re) {
+      mBitmapPool.release(bitmapToReuse);
+      throw re;
+    } finally {
+      mDecodeBuffers.release(byteBuffer);
+    }
+
+    if (bitmapToReuse != decodedBitmap) {
+      mBitmapPool.release(bitmapToReuse);
+      decodedBitmap.recycle();
+      throw new IllegalStateException();
+    }
+
+    return CloseableReference.of(decodedBitmap, mBitmapPool);
+  }
+
+  @Override
+  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(
+          EncodedImage encodedImage,
+          Bitmap.Config bitmapConfig) {
+    int[] file_size = new int[1];
+    final BitmapFactory.Options options = KpgUtil.getOptions(encodedImage, bitmapConfig, file_size);
+    boolean retryOnFail=options.inPreferredConfig != Bitmap.Config.ARGB_8888;
+    try {
+      return decodeKpgFromStream(encodedImage.getInputStream(), options, file_size[0]);
+    } catch (RuntimeException re) {
+      if (retryOnFail) {
+        return decodeKpgFromEncodedImage(encodedImage, Bitmap.Config.ARGB_8888);
+      }
+      throw re;
+    }
   }
 }

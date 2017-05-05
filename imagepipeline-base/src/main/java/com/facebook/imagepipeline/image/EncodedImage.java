@@ -32,6 +32,7 @@ import com.facebook.imageformat.ImageFormat;
 import com.facebook.imageformat.ImageFormatChecker;
 import com.facebook.imageutils.BitmapUtil;
 import com.facebook.imageutils.JfifUtil;
+import com.facebook.imageutils.KpgUtil;
 import com.facebook.imageutils.WebpUtil;
 
 /**
@@ -306,7 +307,9 @@ public class EncodedImage implements Closeable {
     final Pair<Integer, Integer> dimensions;
     if (DefaultImageFormats.isWebpFormat(imageFormat)) {
       dimensions = readWebPImageSize();
-    } else {
+    } else if(DefaultImageFormats.isKpgFormat(imageFormat)) {
+      dimensions = readKpgImageSize();
+    }else{
       dimensions = readImageSize();
     }
     if (imageFormat == DefaultImageFormats.JPEG && mRotationAngle == UNKNOWN_ROTATION_ANGLE) {
@@ -325,6 +328,18 @@ public class EncodedImage implements Closeable {
    */
   private Pair<Integer, Integer> readWebPImageSize() {
     final Pair<Integer, Integer> dimensions = WebpUtil.getSize(getInputStream());
+    if (dimensions != null) {
+      mWidth = dimensions.first;
+      mHeight = dimensions.second;
+    }
+    return dimensions;
+  }
+
+  /**
+   * We get the size from a Kpg image
+   */
+  private Pair<Integer, Integer> readKpgImageSize() {
+    final Pair<Integer, Integer> dimensions = KpgUtil.getSize(getInputStream());
     if (dimensions != null) {
       mWidth = dimensions.first;
       mHeight = dimensions.second;

@@ -15,6 +15,9 @@ import java.io.InputStream;
 import com.facebook.common.internal.Ints;
 import com.facebook.common.internal.Preconditions;
 import com.facebook.common.webp.WebpSupportStatus;
+import com.facebook.imageutils.KpgUtil;
+
+import static com.facebook.imageformat.ImageFormatCheckerUtils.asciiBytes;
 
 /**
  * Default image format checker that is able to determine all {@link DefaultImageFormats}.
@@ -34,7 +37,8 @@ public class DefaultImageFormatChecker implements ImageFormat.FormatChecker {
       JPEG_HEADER_LENGTH,
       PNG_HEADER_LENGTH,
       GIF_HEADER_LENGTH,
-      BMP_HEADER_LENGTH);
+      BMP_HEADER_LENGTH,
+      KPG_HEADER_LENGTH);
 
   @Override
   public int getHeaderSize() {
@@ -72,6 +76,10 @@ public class DefaultImageFormatChecker implements ImageFormat.FormatChecker {
 
     if (isBmpHeader(headerBytes, headerSize)) {
       return DefaultImageFormats.BMP;
+    }
+
+    if (isKpgHeader(headerBytes, headerSize)) {
+      return DefaultImageFormats.KPG;
     }
 
     return ImageFormat.UNKNOWN;
@@ -168,8 +176,8 @@ public class DefaultImageFormatChecker implements ImageFormat.FormatChecker {
    * Every gif image starts with "GIF" bytes followed by
    * bytes indicating version of gif standard
    */
-  private static final byte[] GIF_HEADER_87A = ImageFormatCheckerUtils.asciiBytes("GIF87a");
-  private static final byte[] GIF_HEADER_89A = ImageFormatCheckerUtils.asciiBytes("GIF89a");
+  private static final byte[] GIF_HEADER_87A = asciiBytes("GIF87a");
+  private static final byte[] GIF_HEADER_89A = asciiBytes("GIF89a");
   private static final int GIF_HEADER_LENGTH = 6;
 
   /**
@@ -191,7 +199,7 @@ public class DefaultImageFormatChecker implements ImageFormat.FormatChecker {
   /**
    * Every bmp image starts with "BM" bytes
    */
-  private static final byte[] BMP_HEADER = ImageFormatCheckerUtils.asciiBytes("BM");
+  private static final byte[] BMP_HEADER = asciiBytes("BM");
   private static final int BMP_HEADER_LENGTH = BMP_HEADER.length;
 
   /**
@@ -208,4 +216,44 @@ public class DefaultImageFormatChecker implements ImageFormat.FormatChecker {
     }
     return ImageFormatCheckerUtils.startsWithPattern(imageHeaderBytes, BMP_HEADER);
   }
+
+
+  /**
+   * KPG Start Code Determine
+   */
+  private static final int KPG_HEADER_LENGTH = 12;
+
+  private static boolean matchBytePattern(
+          final byte[] byteArray,
+          final int offset,
+          final byte[] pattern) {
+    if (pattern == null || byteArray == null) {
+      return false;
+    }
+    if (pattern.length + offset > byteArray.length) {
+      return false;
+    }
+
+    for (int i = 0; i < pattern.length; ++i) {
+      if (byteArray[i + offset] != pattern[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+  /**
+   * Checks if first headerSize bytes of imageHeaderBytes constitute a valid header for a KPG image.
+   * Details on KPG header can be found <a href="http://wiki.corp.kuaishou.com/pages/viewpage.action?pageId=13357265">
+   * </a>
+   * @param imageHeaderBytes
+   * @param headerSize
+   * @return true if imageHeaderBytes is a valid header for a kpg image
+   */
+  private static boolean isKpgHeader(final byte[] imageHeaderBytes, final int headerSize) {
+    return headerSize >= KPG_HEADER_LENGTH &&
+            matchBytePattern(imageHeaderBytes, 0, asciiBytes("RIFF")) &&
+            matchBytePattern(imageHeaderBytes, 8, asciiBytes("KPGB"));
+  }
+
 }
