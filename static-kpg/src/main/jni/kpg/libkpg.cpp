@@ -13,9 +13,10 @@ typedef struct CodecContext {
 } CodecContext;
 
 #define HEADER_LENGTH 28
-
 JNIEXPORT
-jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass clazz, jbyteArray bs, jint len, jint width, jint height) {
+jintArray Java_com_facebook_samples_demo_kpg_KpgUtil_nativedecode(JNIEnv *env, jclass clazz, jbyteArray bs, jint len, jint width, jint height){
+//JNIEXPORT
+//jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass clazz, jbyteArray bs, jint len, jint width, jint height) {
     //Header offset
     LOGI("Start Prepare");
 

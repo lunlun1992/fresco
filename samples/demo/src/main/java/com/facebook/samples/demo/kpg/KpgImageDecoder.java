@@ -1,14 +1,21 @@
 package com.facebook.samples.demo.kpg;
 
+import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.common.ImageDecodeOptions;
 import com.facebook.imagepipeline.decoder.ImageDecoder;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.image.EncodedImage;
+import com.facebook.imagepipeline.image.ImmutableQualityInfo;
 import com.facebook.imagepipeline.image.QualityInfo;
+import com.facebook.imagepipeline.memory.BitmapPool;
 import com.facebook.imagepipeline.memory.PoolFactory;
 import com.facebook.imageutils.KpgUtil;
 
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.support.v4.util.Pools;
+import android.util.Log;
 import android.util.Pair;
 
 /**
@@ -17,7 +24,7 @@ import android.util.Pair;
 
 public class KpgImageDecoder implements ImageDecoder {
 
-    KpgPlatformDecoder mPlatformDecoder;
+    private final KpgPlatformDecoder mPlatformDecoder;
 
     public KpgImageDecoder(PoolFactory poolFactory) {
         mPlatformDecoder = buildPlatformDecoder(poolFactory);
@@ -25,41 +32,35 @@ public class KpgImageDecoder implements ImageDecoder {
 
     public static KpgPlatformDecoder buildPlatformDecoder(
             PoolFactory poolFactory) {
-        return null;
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            int maxNumThreads = poolFactory.getFlexByteArrayPoolMaxNumThreads();
-//            return new ArtDecoder(
-//                    poolFactory.getBitmapPool(),
-//                    maxNumThreads,
-//                    new Pools.SynchronizedPool<>(maxNumThreads));
-//        } else {
-//            return new KitKatPurgeableDecoder(poolFactory.getFlexByteArrayPool());
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            int maxNumThreads = poolFactory.getFlexByteArrayPoolMaxNumThreads();
+            return new KpgArtDecoder(
+                    poolFactory.getBitmapPool(),
+                    maxNumThreads,
+                    new Pools.SynchronizedPool<>(maxNumThreads));
+        } else {
+            return null;
+            //return new KpgKitKatPurgeableDecoder(poolFactory.getFlexByteArrayPool());
+        }
     }
 
     @Override
     public CloseableImage decode(EncodedImage encodedImage, int length, QualityInfo qualityInfo,
             ImageDecodeOptions options) {
         parseMetadata(encodedImage);
-        return decodeKpgStaticImage(encodedImage, options);
-    }
-
-
-    public CloseableStaticBitmap decodeKpgStaticImage(
-            final EncodedImage encodedImage,
-            ImageDecodeOptions options) {
         // TODO: 22/05/2017 puth mPlatformDecoder related implemention here
-//        CloseableReference<Bitmap> bitmapReference =
-//                mPlatformDecoder.decodeKpgFromEncodedImage(encodedImage, options.bitmapConfig);
-//        try {
-//            return new CloseableStaticBitmap(
-//                    bitmapReference,
-//                    ImmutableQualityInfo.FULL_QUALITY,
-//                    encodedImage.getRotationAngle());
-//        } finally {
-//            bitmapReference.close();
-//        }
-        return null;
+        Log.d("KpgImageDecoder", "decode");
+
+        CloseableReference<Bitmap> bitmapReference =
+                mPlatformDecoder.decodeKpgFromEncodedImage(encodedImage, options.bitmapConfig);
+        try {
+            return new CloseableStaticBitmap(
+                    bitmapReference,
+                    ImmutableQualityInfo.FULL_QUALITY,
+                    encodedImage.getRotationAngle());
+        } finally {
+            bitmapReference.close();
+        }
     }
 
     private static void parseMetadata(EncodedImage encodedImage) {

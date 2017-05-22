@@ -21,10 +21,11 @@ import java.util.ArrayList;
 public class KpgUtil
 {
     static{
-        System.loadLibrary("avutil");
-        System.loadLibrary("avcodec");
-        System.loadLibrary("swresample");
-        System.loadLibrary("swscale");
+//        System.loadLibrary("avutil");
+//        System.loadLibrary("avcodec");
+//        System.loadLibrary("swresample");
+//        System.loadLibrary("swscale");
+        System.loadLibrary("ffmpeg");
         System.loadLibrary("kpg");
     }
 
