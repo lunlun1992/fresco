@@ -7,13 +7,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.util.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-
-import javax.annotation.Nullable;
 
 /**
  * Created by fengweilun on 02/05/2017.

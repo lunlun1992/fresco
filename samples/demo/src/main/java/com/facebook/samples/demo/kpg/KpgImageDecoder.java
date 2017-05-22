@@ -16,6 +16,7 @@ import android.util.Pair;
 
 public class KpgImageDecoder implements ImageDecoder {
 
+
     @Override
     public CloseableImage decode(EncodedImage encodedImage, int length, QualityInfo qualityInfo,
             ImageDecodeOptions options) {
