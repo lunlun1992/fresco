@@ -31,10 +31,17 @@ public class KpgUtil
 
     private native static int[] nativedecode(byte[] bs, int len, int pic_width, int pic_height);
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static Bitmap decodePurgable(byte[] data, int offset, int length, BitmapFactory.Options opts)
+    {
+        int[] argb = nativedecode(data, length, opts.outWidth, opts.outHeight);
+        return Bitmap.createBitmap(argb, opts.outWidth, opts.outHeight, Bitmap.Config.ARGB_8888);
+    }
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static Bitmap decodeStream(InputStream is, Rect outPadding, BitmapFactory.Options opts, int filesize)
     {
-        Bitmap bitmap;
+        Bitmap bitmap = null;
         try {
             byte[] stream = new byte[filesize];
             is.read(stream);

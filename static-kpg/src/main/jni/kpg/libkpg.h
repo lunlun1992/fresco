@@ -52,7 +52,7 @@ void open_ffmpeg_log_in_debug_mode() {
     if (1) {
         LOGD("ffmpeg log opened");
         av_log_set_callback(av_log_new_callback);
-        av_log_set_level(50);
+        av_log_set_level(100);
     } else {
         LOGD("ffmpeg log not open");
     }

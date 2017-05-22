@@ -15,7 +15,6 @@ import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.memory.BitmapPool;
 import com.facebook.imageutils.BitmapUtil;
-import com.facebook.samples.demo.kpg.KpgUtil;
 
 /**
  * Created by fengweilun on 22/05/2017.

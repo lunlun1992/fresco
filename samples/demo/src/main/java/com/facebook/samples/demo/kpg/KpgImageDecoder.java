@@ -40,6 +40,7 @@ public class KpgImageDecoder implements ImageDecoder {
                     new Pools.SynchronizedPool<>(maxNumThreads));
         } else {
             return null;
+            //TODO 23/05/2017 fix the sws_scale libc bug
             //return new KpgKitKatPurgeableDecoder(poolFactory.getFlexByteArrayPool());
         }
     }
@@ -50,9 +51,10 @@ public class KpgImageDecoder implements ImageDecoder {
         parseMetadata(encodedImage);
         // TODO: 22/05/2017 puth mPlatformDecoder related implemention here
         Log.d("KpgImageDecoder", "decode");
-
-        CloseableReference<Bitmap> bitmapReference =
-                mPlatformDecoder.decodeKpgFromEncodedImage(encodedImage, options.bitmapConfig);
+        CloseableReference<Bitmap> bitmapReference = null;
+        if(null != mPlatformDecoder) {
+            bitmapReference = mPlatformDecoder.decodeKpgFromEncodedImage(encodedImage, options.bitmapConfig);
+        }
         try {
             return new CloseableStaticBitmap(
                     bitmapReference,
