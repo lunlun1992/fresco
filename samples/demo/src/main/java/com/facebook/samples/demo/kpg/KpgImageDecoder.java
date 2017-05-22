@@ -6,6 +6,7 @@ import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.image.QualityInfo;
+import com.facebook.imagepipeline.memory.PoolFactory;
 import com.facebook.imageutils.KpgUtil;
 
 import android.util.Pair;
@@ -16,6 +17,25 @@ import android.util.Pair;
 
 public class KpgImageDecoder implements ImageDecoder {
 
+    KpgPlatformDecoder mPlatformDecoder;
+
+    public KpgImageDecoder(PoolFactory poolFactory) {
+        mPlatformDecoder = buildPlatformDecoder(poolFactory);
+    }
+
+    public static KpgPlatformDecoder buildPlatformDecoder(
+            PoolFactory poolFactory) {
+        return null;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            int maxNumThreads = poolFactory.getFlexByteArrayPoolMaxNumThreads();
+//            return new ArtDecoder(
+//                    poolFactory.getBitmapPool(),
+//                    maxNumThreads,
+//                    new Pools.SynchronizedPool<>(maxNumThreads));
+//        } else {
+//            return new KitKatPurgeableDecoder(poolFactory.getFlexByteArrayPool());
+//        }
+    }
 
     @Override
     public CloseableImage decode(EncodedImage encodedImage, int length, QualityInfo qualityInfo,
