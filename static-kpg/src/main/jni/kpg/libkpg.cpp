@@ -4,12 +4,7 @@
 extern "C"
 {
 #include "libkpg.h"
-#include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
-#include "libavutil/avutil.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
+
 
 typedef struct CodecContext {
     AVCodec *pCodec;
@@ -30,7 +25,10 @@ jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass 
     jintArray outarray = env->NewIntArray(width * height);
     int *arrayelem = (int *)malloc(sizeof(int) * width * height);
     jbyte* bsbyte = env->GetByteArrayElements(bs, NULL);
+
     avcodec_register_all();
+    open_ffmpeg_log_in_debug_mode();
+
     codec.pCodec = avcodec_find_decoder(AV_CODEC_ID_HEVC);
     if (!codec.pCodec) {
         LOGE("Codec not found\n");
@@ -42,18 +40,14 @@ jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass 
         return NULL;
     }
     if (avcodec_open2(codec.pCodecCtx, codec.pCodec, NULL) < 0) {
-        printf("Could not open codec\n");
+        LOGE("Could not open codec\n");
         return NULL;
     }
     av_init_packet(&packet);
-    packet.data = (uint8_t *) malloc(sizeof(uint8_t) * len);
-    packet.size = (int) len;
     codec.pFrame = av_frame_alloc();
-    memcpy(packet.data, (uint8_t *)bsbyte, (size_t) len);
 
-    void *packettofree = packet.data;
-    packet.data += HEADER_LENGTH;
-    packet.size -= HEADER_LENGTH;
+    packet.data = (uint8_t *)bsbyte + HEADER_LENGTH;
+    packet.size = len - HEADER_LENGTH;
 
     LOGI("data: %d, %d, %d, %d", packet.data[0], packet.data[1], packet.data[2], packet.data[3]);
     LOGI("Start Decode");
@@ -87,7 +81,6 @@ jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass 
     }
 
     {
-
         SwsContext *swsContext = NULL;
         const uint8_t *const srcslice[3] = {codec.pFrame->data[0], codec.pFrame->data[1], codec.pFrame->data[2]};
         uint8_t *const dstslice[3] = {(uint8_t *)arrayelem, NULL, NULL};
@@ -104,7 +97,6 @@ jintArray Java_com_facebook_imageutils_KpgUtil_nativedecode(JNIEnv *env, jclass 
     LOGI("Start Free");
     avcodec_close(codec.pCodecCtx);
     av_free((void *) codec.pCodecCtx);
-    free(packettofree);
     av_frame_unref(codec.pFrame);
     av_frame_free(&codec.pFrame);
     av_packet_unref(&packet);

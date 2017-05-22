@@ -1467,6 +1467,8 @@ typedef struct AVPacket {
     uint8_t *data;
     int   size;
     int   stream_index;
+    int   priority;
+
     /**
      * A combination of AV_PKT_FLAG values
      */
@@ -1495,9 +1497,17 @@ typedef struct AVPacket {
     attribute_deprecated
     int64_t convergence_duration;
 #endif
+    int cur_seq_no;
+    int pic_type;
 } AVPacket;
 #define AV_PKT_FLAG_KEY     0x0001 ///< The packet contains a keyframe
 #define AV_PKT_FLAG_CORRUPT 0x0002 ///< The packet content is corrupted
+/**
+ * Flag is used to discard packets which are required to maintain valid
+ * decoder state but are not required for output and should be dropped
+ * after decoding.
+ **/
+#define AV_PKT_FLAG_DISCARD   0x0004
 
 enum AVSideDataParamChangeFlags {
     AV_SIDE_DATA_PARAM_CHANGE_CHANNEL_COUNT  = 0x0001,
@@ -1595,7 +1605,6 @@ typedef struct AVCodecContext {
      *             if this info is available in the stream
      */
     int64_t bit_rate;
-
     /**
      * number of bits the bitstream is allowed to diverge from the reference.
      *           the reference can be CBR (for CBR pass1) or VBR (for pass2)
@@ -1751,13 +1760,11 @@ typedef struct AVCodecContext {
      */
     enum AVPixelFormat pix_fmt;
 
-#if FF_API_MOTION_EST
     /**
      * This option does nothing
      * @deprecated use codec private options instead
      */
-    attribute_deprecated int me_method;
-#endif
+    int me_method;
 
     /**
      * If non NULL, 'draw_horiz_band' is called by the libavcodec
@@ -2618,8 +2625,13 @@ typedef struct AVCodecContext {
      * trellis RD quantization
      * - encoding: Set by user.
      * - decoding: unused
-     */
+     */ 
     int trellis;
+
+    /**
+     * allow each mb partition to have its own reference number.
+     */
+    int mixed_refs;
 
 #if FF_API_PRIVATE_OPT
     /** @deprecated use encoder private options instead */

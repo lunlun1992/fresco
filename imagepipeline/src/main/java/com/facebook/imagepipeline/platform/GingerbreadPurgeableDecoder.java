@@ -123,6 +123,11 @@ public class GingerbreadPurgeableDecoder extends DalvikPurgeableDecoder {
     }
   }
 
+  @Override
+  Bitmap decodeKPGAsPurgeable(CloseableReference<PooledByteBuffer> bytesRef, BitmapFactory.Options options, int file_size) {
+    return null;
+  }
+
   protected Bitmap decodeFileDescriptorAsPurgeable(
       CloseableReference<PooledByteBuffer> bytesRef,
       int inputLength,
@@ -141,10 +146,5 @@ public class GingerbreadPurgeableDecoder extends DalvikPurgeableDecoder {
         memoryFile.close();
       }
     }
-  }
-
-  @Override
-  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(EncodedImage encodedImage, Bitmap.Config bitmapConfig) {
-    return null;
   }
 }

@@ -23,6 +23,7 @@ import com.facebook.imagepipeline.memory.BitmapCounter;
 import com.facebook.imagepipeline.memory.BitmapCounterProvider;
 import com.facebook.imagepipeline.nativecode.Bitmaps;
 import com.facebook.imageutils.JfifUtil;
+import com.facebook.imageutils.KpgUtil;
 
 /**
  * Base class for bitmap decodes for Dalvik VM (Gingerbread to KitKat).
@@ -93,8 +94,21 @@ abstract class DalvikPurgeableDecoder implements PlatformDecoder {
     }
   }
 
+  @Override
+  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(EncodedImage encodedImage, Bitmap.Config bitmapConfig) {
+    int[] file_size = new int[1];
+    final BitmapFactory.Options options = KpgUtil.getOptions(encodedImage, bitmapConfig, file_size);
+    CloseableReference<PooledByteBuffer> bytesRef = encodedImage.getByteBufferRef();
+    Preconditions.checkNotNull(bytesRef);
+    try {
+      Bitmap bitmap = decodeKPGAsPurgeable(bytesRef, options, file_size[0]);
+      return pinBitmap(bitmap);
+    } finally {
+      CloseableReference.closeSafely(bytesRef);
+    }
+  }
 
-
+  abstract Bitmap decodeKPGAsPurgeable(CloseableReference<PooledByteBuffer> bytesRef, BitmapFactory.Options options, int file_size);
   /**
    * Decodes a byteArray into a purgeable bitmap
    *

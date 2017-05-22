@@ -22,6 +22,8 @@ import com.facebook.common.references.CloseableReference;
 import com.facebook.imagepipeline.image.EncodedImage;
 import com.facebook.imagepipeline.memory.FlexByteArrayPool;
 import com.facebook.imageutils.JfifUtil;
+import com.facebook.imageutils.KpgUtil;
+
 
 /**
  * Bitmap Decoder implementation for KitKat
@@ -37,6 +39,27 @@ public class KitKatPurgeableDecoder extends DalvikPurgeableDecoder {
 
   public KitKatPurgeableDecoder(FlexByteArrayPool flexByteArrayPool) {
     mFlexByteArrayPool = flexByteArrayPool;
+  }
+
+  @Override
+  Bitmap decodeKPGAsPurgeable(CloseableReference<PooledByteBuffer> bytesRef, BitmapFactory.Options options, int file_size) {
+    byte[] suffix = endsWithEOI(bytesRef, file_size) ? null : EOI;
+    final PooledByteBuffer pooledByteBuffer = bytesRef.get();
+    Preconditions.checkArgument(file_size <= pooledByteBuffer.size());
+    // allocate bigger array in case EOI needs to be added
+    final CloseableReference<byte[]> encodedBytesArrayRef = mFlexByteArrayPool.get(file_size + 2);
+    try {
+      byte[] encodedBytesArray = encodedBytesArrayRef.get();
+      pooledByteBuffer.read(0, encodedBytesArray, 0, file_size);
+      if (suffix != null) {
+        putEOI(encodedBytesArray, file_size);
+        file_size += 2;
+      }
+      Bitmap bitmap = KpgUtil.decodePurgable(encodedBytesArray, 0, file_size, options);
+      return Preconditions.checkNotNull(bitmap, "BitmapFactory returned null");
+    } finally {
+      CloseableReference.closeSafely(encodedBytesArrayRef);
+    }
   }
 
   /**
@@ -65,12 +88,6 @@ public class KitKatPurgeableDecoder extends DalvikPurgeableDecoder {
       CloseableReference.closeSafely(encodedBytesArrayRef);
     }
   }
-
-  @Override
-  public CloseableReference<Bitmap> decodeKpgFromEncodedImage(EncodedImage encodedImage, Bitmap.Config bitmapConfig) {
-    return null;
-  }
-
   /**
    * Decodes a byteArray containing jpeg encoded bytes into a purgeable bitmap
    *
