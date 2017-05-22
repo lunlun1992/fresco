@@ -17,6 +17,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
+import com.facebook.samples.demo.kpg.KpgCustomImageFormatConfigurator;
 
 import android.app.Application;
 
@@ -35,7 +36,7 @@ public class DemoApplication extends Application {
         Set<RequestListener> listeners = new HashSet<>();
         listeners.add(new RequestLoggingListener());
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
-//                .setImageDecoderConfig(KpgCustomImageFormatConfigurator.createImageDecoderConfig(this))   // use this syntax to add kpg capability
+                .setImageDecoderConfig(KpgCustomImageFormatConfigurator.createImageDecoderConfig(this))   // use this syntax to add kpg capability
                 .setRequestListeners(listeners)
                 .build();
         DraweeConfig draweeConfig = DraweeConfig.newBuilder()

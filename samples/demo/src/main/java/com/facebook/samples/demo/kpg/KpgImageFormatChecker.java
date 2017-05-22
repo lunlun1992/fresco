@@ -1,10 +1,10 @@
 package com.facebook.samples.demo.kpg;
 
 import com.facebook.imageformat.ImageFormat;
+import com.facebook.imageformat.ImageFormatCheckerUtils;
 
 import android.support.annotation.Nullable;
 
-import static com.facebook.imageformat.ImageFormatCheckerUtils.asciiBytes;
 
 /**
  * Created by shuailongcheng on 22/05/2017.
@@ -47,8 +47,8 @@ public class KpgImageFormatChecker implements ImageFormat.FormatChecker {
      */
     private static boolean isKpgHeader(final byte[] imageHeaderBytes, final int headerSize) {
         return headerSize >= KPG_HEADER_LENGTH &&
-                matchBytePattern(imageHeaderBytes, 0, asciiBytes("RIFF")) &&
-                matchBytePattern(imageHeaderBytes, 8, asciiBytes("KPGB"));
+                matchBytePattern(imageHeaderBytes, 0, ImageFormatCheckerUtils.asciiBytes("RIFF")) &&
+                matchBytePattern(imageHeaderBytes, 8, ImageFormatCheckerUtils.asciiBytes("KPGB"));
     }
 
     @Override
