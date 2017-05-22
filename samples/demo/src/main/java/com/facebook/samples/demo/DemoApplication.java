@@ -11,14 +11,14 @@
  */
 package com.facebook.samples.demo;
 
-import android.app.Application;
-
 import com.facebook.common.logging.FLog;
 import com.facebook.drawee.backends.pipeline.DraweeConfig;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.listener.RequestListener;
 import com.facebook.imagepipeline.listener.RequestLoggingListener;
+
+import android.app.Application;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -35,11 +35,12 @@ public class DemoApplication extends Application {
         Set<RequestListener> listeners = new HashSet<>();
         listeners.add(new RequestLoggingListener());
         ImagePipelineConfig config = ImagePipelineConfig.newBuilder(this)
+//                .setImageDecoderConfig(KpgCustomImageFormatConfigurator.createImageDecoderConfig(this))   // use this syntax to add kpg capability
                 .setRequestListeners(listeners)
                 .build();
         DraweeConfig draweeConfig = DraweeConfig.newBuilder()
-            .setDrawDebugOverlay(DebugOverlayHelper.isDebugOverlayEnabled(this))
-            .build();
+                .setDrawDebugOverlay(DebugOverlayHelper.isDebugOverlayEnabled(this))
+                .build();
         Fresco.initialize(this, config, draweeConfig);
     }
 }

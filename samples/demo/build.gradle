@@ -30,9 +30,14 @@ android {
 
     buildTypes {
         release {
+            debuggable true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), '../../proguard-fresco.pro'
         }
+
+//        debug {
+//            debuggable true
+//        }
     }
 
     lintOptions {

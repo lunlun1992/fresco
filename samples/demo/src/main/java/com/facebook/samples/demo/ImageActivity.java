@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.widget.ListView;
 
 import java.io.File;
@@ -23,6 +24,11 @@ public class ImageActivity extends Activity {
             Uri uri = Uri.fromFile(file);
             datas.add(uri.toString());
         }
+        Log.d("external", Environment.getExternalStorageDirectory().getPath() + "/kpgtest/");
+
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/watermark.png");
+        boolean ex = file.exists();
+        datas.add(Uri.fromFile(file).toString());
 
 
         ListView listViewleft = (ListView) this.findViewById(R.id.list_left);
